@@ -29,7 +29,6 @@
         padding: 0 20px;
     }
 
-    /* DESCRIÇÃO DEBAIXO DO TÍTULO */
     .descricao-topo {
         margin-top: 10px;
         max-width: 700px;
@@ -109,9 +108,6 @@
         letter-spacing: 1px;
     }
 
-    /* =======================
-       RESPONSIVIDADE MOBILE
-       ======================= */
     @media (max-width: 850px) {
         .grid {
             grid-template-columns: repeat(3, 120px);
@@ -161,7 +157,7 @@
 <h1>BINGO KUB1N4SH1</h1>
 
 <div class="descricao-topo">
-    Este bingo interativo foi inspirado nos melhores clássicos argumentativos e nas maiores
+    Este bingo interativo foi inspirado nos maiores clássicos argumentativos nas maiores
     pérolas ditas ao longo do Discord como justificativa do injustificável. Clica nos
     quadrados para desbloquear frases lendárias — mas cuidado: cada novo quadrado revela
     uma mensagem inédita… e cada shot aproxima-te de um caminho sem retorno...
@@ -193,18 +189,18 @@ const mensagens = [
     "A reciclagem bugou"
 ];
 
-const grid = document.getElementById("grid");
-
 let tileAtivo = null;
 let ultimaMensagemGlobal = null;
 
-function gerarMensagemNova(ultimaLocal) {
+function gerarMensagemNova(ultimaGlobal) {
     let msg;
     do {
         msg = mensagens[Math.floor(Math.random() * mensagens.length)];
-    } while (msg === ultimaLocal || msg === ultimaMensagemGlobal);
+    } while (msg === ultimaGlobal);
     return msg;
 }
+
+const grid = document.getElementById("grid");
 
 for (let i = 0; i < 16; i++) {
     const tile = document.createElement("div");
@@ -223,21 +219,26 @@ for (let i = 0; i < 16; i++) {
 
     tile.addEventListener("click", () => {
 
+        // Caso 1 — clicar no tile já ativo → fecha, mas NÃO apaga a mensagem
         if (tileAtivo === tile) {
             tile.classList.remove("flip");
             tileAtivo = null;
             return;
         }
 
+        // Caso 2 — clicar noutro tile → fechar o anterior e apagar mensagem dele
         if (tileAtivo) {
             tileAtivo.classList.remove("flip");
-            tileAtivo.msg = null;
+            tileAtivo.msg = null; // ← apagado apenas aqui
         }
 
-        tile.msg = gerarMensagemNova(tile.msg);
-        ultimaMensagemGlobal = tile.msg;
+        // Caso 3 — abrir tile atual
+        if (!tile.msg) {
+            tile.msg = gerarMensagemNova(ultimaMensagemGlobal);
+        }
 
         back.textContent = tile.msg;
+        ultimaMensagemGlobal = tile.msg;
 
         tile.classList.add("flip");
         tileAtivo = tile;
@@ -249,4 +250,3 @@ for (let i = 0; i < 16; i++) {
 
 </body>
 </html>
-
